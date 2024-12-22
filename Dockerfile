@@ -23,7 +23,7 @@ RUN apk --no-cache add curl tar && \
     apk add --no-cache ${JAVA_PACKAGE}
 
 # Copy the application WAR file into Tomcat's webapps directory
-COPY /root sample.war $CATALINA_HOME/webapps/
+COPY sample.war $CATALINA_HOME/webapps/
 
 # Expose Tomcat's default port
 EXPOSE 8080
