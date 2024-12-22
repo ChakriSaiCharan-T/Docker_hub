@@ -1,13 +1,13 @@
 pipeline {
     agent any 
     environment {
-    DOCKERHUB_CREDENTIALS = credentials('Docker_hub')
+    DOCKERHUB_CREDENTIALS = credentials('docker-hub')
     }
     stages { 
 
         stage('Build docker image') {
             steps {  
-                sh ' docker build -t sabair0509/sampleapp:$BUILD_NUMBER .'
+                sh ' docker build -t rakesh/sampleapp:$BUILD_NUMBER .'
             }
         }
         stage('login to dockerhub') {
@@ -17,7 +17,7 @@ pipeline {
         }
         stage('push image') {
             steps{
-                sh ' docker push sabair0509/sampleapp:$BUILD_NUMBER'
+                sh ' docker push rakesh/sampleapp:$BUILD_NUMBER'
             }
         }
 }
