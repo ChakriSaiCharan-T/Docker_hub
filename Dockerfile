@@ -1,15 +1,32 @@
+# Use Alpine Linux as the base image
 FROM alpine:3.10
-MAINTAINER Techie_Horizon
-RUN mkdir /usr/local/tomcat/
-WORKDIR /usr/local/tomcat
-RUN apk --no-cache add curl && \
-    apk add --update curl && \
-        curl -O https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.73/bin/apache-tomcat-9.0.73.tar.gz
-RUN tar -xvf apache*.tar.gz
-RUN mv apache-tomcat-9.0.73/* /usr/local/tomcat/.
-RUN rm -rf apache-*
-COPY SimpleCustomerApp-13-SNAPSHOT.war /usr/local/tomcat/webapps
-RUN apk update && apk add openjdk8
-WORKDIR /usr/local/tomcat
+
+# Maintainer information
+LABEL maintainer="Techie_Horizon"
+
+# Set environment variables for Tomcat and Java versions
+ENV TOMCAT_VERSION=9.0.73 \
+    JAVA_PACKAGE=openjdk11 \
+    CATALINA_HOME=/usr/local/tomcat
+
+# Create directory for Tomcat
+RUN mkdir -p $CATALINA_HOME
+
+# Set working directory
+WORKDIR $CATALINA_HOME
+
+# Install dependencies, download and set up Tomcat, and clean up
+RUN apk --no-cache add curl tar && \
+    curl -O https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    tar -xvf apache-tomcat-${TOMCAT_VERSION}.tar.gz --strip-components=1 && \
+    rm -rf apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    apk add --no-cache ${JAVA_PACKAGE}
+
+# Copy the application WAR file into Tomcat's webapps directory
+COPY SimpleCustomerApp-13-SNAPSHOT.war $CATALINA_HOME/webapps/
+
+# Expose Tomcat's default port
 EXPOSE 8080
-CMD ["/usr/local/tomcat/bin/catalina.sh", "run"]
+
+# Set default command to run Tomcat
+CMD ["bin/catalina.sh", "run"]
