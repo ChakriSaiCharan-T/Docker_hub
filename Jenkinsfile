@@ -1,47 +1,29 @@
 pipeline {
     agent any 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('docker-hub')
+    DOCKERHUB_CREDENTIALS = credentials('docker-hub')
     }
     stages { 
+
         stage('Build docker image') {
             steps {  
-                script {
-                    try {
-                        sh 'docker build -t rakesh/sampleapp:$BUILD_NUMBER .'
-                    } catch (Exception e) {
-                        error("Docker build failed: ${e}")
-                    }
-                }
+                sh ' docker build -t rakeshpagidimarri/dockerhub-nginx:$BUILD_NUMBER .'
             }
         }
-        stage('Login to Docker Hub') {
-            steps {
-                script {
-                    try {
-                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                    } catch (Exception e) {
-                        error("Docker login failed: ${e}")
-                    }
-                }
+        stage('login to dockerhub') {
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    try {
-                        sh 'docker push rakesh/sampleapp:$BUILD_NUMBER'
-                    } catch (Exception e) {
-                        error("Docker push failed: ${e}")
-                    }
-                }
+        stage('push image') {
+            steps{
+                sh ' docker push rakeshpagidimarri/dockerhub-nginx:$BUILD_NUMBER'
             }
         }
-    }
-    post {
+}
+post {
         always {
             sh 'docker logout'
-            
         }
     }
 }
